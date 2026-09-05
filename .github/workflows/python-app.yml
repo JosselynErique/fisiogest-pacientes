@@ -1,0 +1,29 @@
+name: CI FisioGest
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Instalar Flask
+        run: pip install flask
+
+      - name: Verificar aplicación
+        run: python -m py_compile src/app.py
+
+      - name: CI ejecutado correctamente
+        run: echo "Pipeline de FisioGest ejecutado correctamente"
