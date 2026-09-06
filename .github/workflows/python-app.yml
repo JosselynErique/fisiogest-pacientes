@@ -2,9 +2,9 @@ name: CI FisioGest
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   verificar:
@@ -19,11 +19,16 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Instalar Flask
-        run: pip install flask
+      - name: Instalar dependencias
+        run: |
+          pip install flask
+          pip install pytest
 
-      - name: Verificar aplicación
+      - name: Verificar sintaxis
         run: python -m py_compile src/app.py
+
+      - name: Ejecutar pruebas automatizadas
+        run: pytest
 
       - name: CI ejecutado correctamente
         run: echo "Pipeline de FisioGest ejecutado correctamente"
