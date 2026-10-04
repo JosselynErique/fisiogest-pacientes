@@ -1,0 +1,16 @@
+services:
+  fisiogest:
+    build: .
+    image: fisiogest:latest
+    container_name: fisiogest
+    ports:
+      - "5000:5000"
+    environment:
+      FISIOGEST_SECRET_KEY: ${FISIOGEST_SECRET_KEY:-cambia-esta-clave-en-produccion}
+      FISIOGEST_DEMO: ${FISIOGEST_DEMO:-1}
+    volumes:
+      - fisiogest-datos:/data
+    restart: unless-stopped
+
+volumes:
+  fisiogest-datos:
