@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "_macros.html" import campo, csrf %}
+{% block titulo %}Editar paciente{% endblock %}
+{% block migas %}
+<p class="migas">
+    <a href="{{ url_for('listar_pacientes.listar') }}">Pacientes</a> /
+    <a href="{{ url_for('consultar_historial.ver', paciente_id=paciente.id) }}">{{ paciente.nombre_completo }}</a> / Editar
+</p>
+{% endblock %}
+{% block contenido %}
+<section class="tarjeta">
+    <form method="post" class="formulario" novalidate>
+        {{ csrf() }}
+        {{ campo("cedula", "Cédula", datos, errores, requerido=true, attrs='inputmode="numeric" maxlength="10"') }}
+        {{ campo("nombres", "Nombres", datos, errores, requerido=true) }}
+        {{ campo("apellidos", "Apellidos", datos, errores, requerido=true) }}
+        {{ campo("fecha_nacimiento", "Fecha de nacimiento", datos, errores, tipo="date") }}
+        {{ campo("telefono", "Teléfono", datos, errores, attrs='inputmode="tel" maxlength="10"') }}
+        {{ campo("correo", "Correo electrónico", datos, errores, tipo="email") }}
+        {{ campo("direccion", "Dirección", datos, errores) }}
+        {{ campo("contacto_emergencia", "Contacto de emergencia", datos, errores) }}
+        <div class="pie-formulario">
+            <a class="boton boton-secundario" href="{{ url_for('consultar_historial.ver', paciente_id=paciente.id) }}">Cancelar</a>
+            <button class="boton" type="submit">Guardar cambios</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

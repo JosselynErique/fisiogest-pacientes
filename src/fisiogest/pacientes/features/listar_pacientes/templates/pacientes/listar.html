@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "_macros.html" import vacio %}
+{% block titulo %}Pacientes{% endblock %}
+{% block acciones %}
+{% if usuario.rol in (Rol.ADMINISTRADOR, Rol.RECEPCIONISTA) %}
+<a class="boton" href="{{ url_for('registrar_paciente.formulario_nuevo') }}">+ Registrar paciente</a>
+{% endif %}
+{% endblock %}
+{% block contenido %}
+<section class="tarjeta">
+    <form class="filtros" method="get" role="search">
+        <div class="campo campo-busqueda">
+            <label for="q">Buscar</label>
+            <input id="q" name="q" value="{{ q }}" placeholder="Cédula, nombres o apellidos">
+        </div>
+        <label class="casilla"><input type="checkbox" name="inactivos" value="1" {{ 'checked' if incluir_inactivos }} data-autoenviar> Incluir dados de baja</label>
+        <button class="boton boton-secundario" type="submit">Buscar</button>
+    </form>
+
+    {% if pacientes %}
+    <div class="tabla-contenedor">
+        <table>
+            <thead>
+            <tr><th>Cédula</th><th>Paciente</th><th>Edad</th><th>Teléfono</th><th>Correo</th><th>Estado</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for p in pacientes %}
+            <tr class="{{ 'inactivo' if not p.activo }}">
+                <td>{{ p.cedula }}</td>
+                <td><a href="{{ url_for('consultar_historial.ver', paciente_id=p.id) }}"><strong>{{ p.apellidos }}</strong>, {{ p.nombres }}</a></td>
+                <td>{{ p.edad() if p.edad() is not none else '—' }}</td>
+                <td>{{ p.telefono or '—' }}</td>
+                <td>{{ p.correo or '—' }}</td>
+                <td><span class="etiqueta etiqueta-{{ 'activo' if p.activo else 'inactivo' }}">{{ 'Activo' if p.activo else 'De baja' }}</span></td>
+                <td class="acciones-fila">
+                    <a class="boton boton-pequeno boton-secundario" href="{{ url_for('consultar_historial.ver', paciente_id=p.id) }}">Ver ficha</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="ayuda">{{ pacientes|length }} paciente(s)</p>
+    {% else %}
+    {{ vacio("No se encontraron pacientes con ese criterio.") }}
+    {% endif %}
+</section>
+{% endblock %}
