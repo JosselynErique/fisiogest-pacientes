@@ -8,6 +8,11 @@ terminado. El tablero se gestionó en **Jira** (proyecto `FG`) con las columnas:
 
 `Por hacer` → `En curso` → `En revisión (PR + CI)` → `Listo`
 
+En paralelo, el mismo backlog se gestiona en **GitHub Projects** junto al código:
+[tablero FisioGest · Kanban](https://github.com/users/ls-tacob/projects/1/views/1?layout=board).
+Cada tarjeta es un *issue* del repositorio (FG-1 a FG-17), etiquetado por épica y vinculado al
+commit que lo implementa, de modo que el avance del tablero se puede verificar en el historial Git.
+
 **Políticas del tablero**
 
 - Límite WIP de 2 tarjetas en *En curso* por integrante.

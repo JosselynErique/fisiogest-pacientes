@@ -206,3 +206,12 @@ cada push y pull request:
 - [Arquitectura y diagramas UML](docs/arquitectura.md)
 - [Evaluación de calidad ISO/IEC 25010](docs/calidad-iso25010.md)
 - [Plan del proyecto y gestión ágil](docs/plan-proyecto.md)
+- [Tablero Kanban en GitHub Projects](https://github.com/users/ls-tacob/projects/1/views/1?layout=board)
+
+## Capturas
+
+| Panel del administrador | Historial clínico |
+|---|---|
+| ![Panel](docs/capturas/02_panel_admin.png) | ![Historial](docs/capturas/04_historial.png) |
+| **Validación de cruce de horario (RF-05)** | **Reportes (RF-08)** |
+| ![Cruce de horario](docs/capturas/07_cruce_horario_rf05.png) | ![Reportes](docs/capturas/08_reportes.png) |
