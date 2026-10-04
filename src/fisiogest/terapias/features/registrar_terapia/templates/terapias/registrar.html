@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% from "_macros.html" import campo, seleccion, area, csrf %}
+{% block titulo %}Registrar sesión de terapia{% endblock %}
+{% block migas %}
+<p class="migas">
+    {% if cita %}<a href="{{ url_for('consultar_agenda.ver', fecha=cita.fecha.isoformat()) }}">Agenda</a>
+    {% else %}<a href="{{ url_for('listar_pacientes.listar') }}">Pacientes</a>{% endif %}
+    / <a href="{{ url_for('consultar_historial.ver', paciente_id=paciente.id) }}">{{ paciente.nombre_completo }}</a> / Sesión
+</p>
+{% endblock %}
+{% block contenido %}
+<section class="tarjeta">
+    <dl class="ficha">
+        <div><dt>Paciente</dt><dd>{{ paciente.nombre_completo }}</dd></div>
+        <div><dt>Cédula</dt><dd>{{ paciente.cedula }}</dd></div>
+        <div><dt>Edad</dt><dd>{{ paciente.edad() if paciente.edad() is not none else '—' }}</dd></div>
+        {% if cita %}
+        <div><dt>Cita</dt><dd>{{ cita.fecha|fecha }} · {{ cita.hora_inicio|hora }}–{{ cita.hora_fin|hora }}</dd></div>
+        <div><dt>Motivo</dt><dd>{{ cita.motivo or '—' }}</dd></div>
+        {% endif %}
+    </dl>
+</section>
+<section class="tarjeta">
+    <form method="post" class="formulario" novalidate>
+        {{ csrf() }}
+        {% if cita %}
+        <input type="hidden" name="fecha" value="{{ datos.get('fecha') }}">
+        {% else %}
+        {{ campo("fecha", "Fecha de la sesión", datos, errores, tipo="date", requerido=true) }}
+        {% endif %}
+        {{ seleccion("tipo", "Tipo de terapia", tipos, datos, errores, requerido=true) }}
+        {{ campo("zona_tratada", "Zona tratada", datos, errores, requerido=true, ayuda="Ej.: rodilla derecha, zona lumbar") }}
+        {{ seleccion("dolor_inicial", "Dolor al iniciar (EVA 0-10)", eva, datos, errores, requerido=true) }}
+        {{ seleccion("dolor_final", "Dolor al finalizar (EVA 0-10)", eva, datos, errores, requerido=true) }}
+        {{ area("procedimiento", "Procedimiento realizado", datos, errores, requerido=true) }}
+        {{ area("observaciones", "Observaciones y recomendaciones", datos, errores) }}
+        <div class="pie-formulario">
+            <a class="boton boton-secundario" href="{{ url_for('consultar_historial.ver', paciente_id=paciente.id) }}">Cancelar</a>
+            <button class="boton" type="submit">Registrar sesión</button>
+        </div>
+    </form>
+</section>
+{% endblock %}
