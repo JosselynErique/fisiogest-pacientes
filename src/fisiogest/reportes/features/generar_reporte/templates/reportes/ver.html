@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% from "_macros.html" import campo, vacio %}
+{% block titulo %}Reportes{% endblock %}
+{% block acciones %}
+{% if reporte %}
+<button class="boton boton-secundario" type="button" data-imprimir>Imprimir</button>
+<a class="boton" href="{{ url_for('exportar_reporte.csv', desde=datos.desde, hasta=datos.hasta) }}">Exportar CSV</a>
+{% endif %}
+{% endblock %}
+{% block contenido %}
+<section class="tarjeta">
+    <form class="filtros" method="get" novalidate>
+        {{ campo("desde", "Desde", datos, errores, tipo="date") }}
+        {{ campo("hasta", "Hasta", datos, errores, tipo="date") }}
+        <div class="campo"><button class="boton" type="submit">Generar</button></div>
+    </form>
+</section>
+
+{% if reporte %}
+<p class="ayuda">Periodo: {{ reporte.periodo.desde|fecha }} al {{ reporte.periodo.hasta|fecha }}</p>
+<div class="metricas">
+    <div class="metrica"><span>Pacientes atendidos</span><strong>{{ reporte.pacientes_atendidos }}</strong></div>
+    <div class="metrica"><span>Pacientes nuevos</span><strong>{{ reporte.pacientes_nuevos }}</strong></div>
+    <div class="metrica"><span>Sesiones de terapia</span><strong>{{ reporte.sesiones }}</strong></div>
+    <div class="metrica"><span>Citas totales</span><strong>{{ reporte.total_citas }}</strong></div>
+    <div class="metrica"><span>Tasa de cancelación</span><strong>{{ reporte.tasa_cancelacion }}%</strong></div>
+    <div class="metrica"><span>Mejora promedio de dolor</span><strong>{{ reporte.mejora_promedio if reporte.mejora_promedio is not none else '—' }}</strong></div>
+</div>
+
+<div class="rejilla">
+    <section class="tarjeta">
+        <h2>Citas por estado</h2>
+        <table>
+            <thead><tr><th>Estado</th><th class="numero">Citas</th><th>Proporción</th></tr></thead>
+            <tbody>
+            {% for estado, total in reporte.citas_por_estado.items() %}
+            <tr>
+                <td>{{ estado|capitalize }}</td>
+                <td class="numero">{{ total }}</td>
+                <td><div class="barra"><span class="ancho-{{ ((100 * total / reporte.total_citas) if reporte.total_citas else 0)|round(-1)|int }}"></span></div></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+    <section class="tarjeta">
+        <h2>Terapias por tipo</h2>
+        {% if reporte.terapias_por_tipo %}
+        <table>
+            <thead><tr><th>Tipo</th><th class="numero">Sesiones</th></tr></thead>
+            <tbody>
+            {% for tipo, total in reporte.terapias_por_tipo %}
+            <tr><td>{{ tipo }}</td><td class="numero">{{ total }}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}{{ vacio("Sin sesiones en el periodo.") }}{% endif %}
+    </section>
+</div>
+
+<section class="tarjeta">
+    <h2>Desempeño por fisioterapeuta</h2>
+    <div class="tabla-contenedor">
+        <table>
+            <thead><tr><th>Fisioterapeuta</th><th class="numero">Citas atendidas</th><th class="numero">Sesiones</th><th class="numero">Pacientes</th><th class="numero">Mejora prom. EVA</th></tr></thead>
+            <tbody>
+            {% for f in reporte.por_fisioterapeuta %}
+            <tr>
+                <td>{{ f.nombre }}</td>
+                <td class="numero">{{ f.citas_atendidas }}</td>
+                <td class="numero">{{ f.sesiones }}</td>
+                <td class="numero">{{ f.pacientes }}</td>
+                <td class="numero">{{ f.mejora_promedio if f.mejora_promedio is not none else '—' }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
