@@ -39,7 +39,7 @@ class Paciente:
     contacto_emergencia: str = ""
     activo: bool = True
     id: int | None = None
-    creado_en: datetime = field(default_factory=datetime.now)
+    creado_en: datetime = field(default_factory=lambda: datetime.now().replace(microsecond=0))
     actualizado_en: datetime | None = None
 
     @classmethod

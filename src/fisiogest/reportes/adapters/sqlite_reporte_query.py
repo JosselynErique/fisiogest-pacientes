@@ -50,15 +50,15 @@ class SqliteReporteQuery:
                 for f in con.execute(
                     """SELECT u.nombre_completo,
                            (SELECT COUNT(*) FROM citas c WHERE c.fisioterapeuta_id = u.id
-                              AND c.estado = 'atendida' AND c.fecha BETWEEN ?1 AND ?2) AS citas_atendidas,
+                              AND c.estado = 'atendida' AND c.fecha BETWEEN :desde AND :hasta) AS citas_atendidas,
                            COUNT(t.id) AS sesiones,
                            COUNT(DISTINCT t.paciente_id) AS pacientes,
                            AVG(t.dolor_inicial - t.dolor_final) AS mejora
                        FROM usuarios u
-                       LEFT JOIN terapias t ON t.fisioterapeuta_id = u.id AND t.fecha BETWEEN ?1 AND ?2
+                       LEFT JOIN terapias t ON t.fisioterapeuta_id = u.id AND t.fecha BETWEEN :desde AND :hasta
                        WHERE u.rol = 'fisioterapeuta'
                        GROUP BY u.id ORDER BY sesiones DESC, u.nombre_completo""",
-                    rango,
+                    {"desde": rango[0], "hasta": rango[1]},
                 )
             ]
         return Reporte(

@@ -44,7 +44,7 @@ class Usuario:
     intentos_fallidos: int = 0
     bloqueado_hasta: datetime | None = None
     id: int | None = None
-    creado_en: datetime = field(default_factory=datetime.now)
+    creado_en: datetime = field(default_factory=lambda: datetime.now().replace(microsecond=0))
 
     MAX_INTENTOS = 5
     MINUTOS_BLOQUEO = 10

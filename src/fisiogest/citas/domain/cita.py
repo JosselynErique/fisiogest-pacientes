@@ -43,7 +43,7 @@ class Cita:
     estado: EstadoCita = EstadoCita.PROGRAMADA
     motivo_cancelacion: str = ""
     id: int | None = None
-    creado_en: datetime = field(default_factory=datetime.now)
+    creado_en: datetime = field(default_factory=lambda: datetime.now().replace(microsecond=0))
 
     @classmethod
     def programar(cls, datos: DatosCita, ahora: datetime) -> Cita:

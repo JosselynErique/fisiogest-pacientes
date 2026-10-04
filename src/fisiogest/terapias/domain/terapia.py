@@ -49,7 +49,7 @@ class Terapia:
     observaciones: str = ""
     cita_id: int | None = None
     id: int | None = None
-    creado_en: datetime = field(default_factory=datetime.now)
+    creado_en: datetime = field(default_factory=lambda: datetime.now().replace(microsecond=0))
 
     @classmethod
     def registrar(
