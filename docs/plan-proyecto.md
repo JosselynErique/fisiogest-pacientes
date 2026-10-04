@@ -4,9 +4,13 @@
 
 Se eligió **Kanban** (Unidad 1) porque el equipo es pequeño (2 integrantes), los requisitos se
 fueron refinando por unidad y se necesitaba ver de un vistazo qué estaba pendiente, en curso y
-terminado. El tablero se gestionó en **Jira** (proyecto `FG`) con las columnas:
+terminado. El tablero se gestionó en **Jira** (espacio *FisioGest*, clave `FG`) con las columnas:
 
 `Por hacer` → `En curso` → `En revisión (PR + CI)` → `Listo`
+
+> El sitio de Jira original (`fisioges.atlassian.net`) fue desactivado por Atlassian por inactividad;
+> el tablero se reconstruyó el 03/10/2026 con el mismo backlog (`santiagotacobatson.atlassian.net`,
+> espacio FisioGest). Captura: [docs/capturas/19_jira_kanban.jpg](capturas/19_jira_kanban.jpg).
 
 En paralelo, el mismo backlog se gestiona en **GitHub Projects** junto al código:
 [tablero FisioGest · Kanban](https://github.com/users/ls-tacob/projects/1/views/1?layout=board).
