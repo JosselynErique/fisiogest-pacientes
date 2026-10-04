@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf, estado_cita, vacio %}
+{% block titulo %}{{ p.nombre_completo }}{% endblock %}
+{% block migas %}<p class="migas"><a href="{{ url_for('listar_pacientes.listar') }}">Pacientes</a> / Historial clínico</p>{% endblock %}
+{% block acciones %}
+<button class="boton boton-secundario no-imprimir" type="button" data-imprimir>Imprimir</button>
+{% if p.activo %}
+    {% if usuario.rol in (Rol.ADMINISTRADOR, Rol.RECEPCIONISTA) %}
+    <a class="boton boton-secundario" href="{{ url_for('actualizar_paciente.formulario_edicion', paciente_id=p.id) }}">Editar datos</a>
+    <a class="boton" href="{{ url_for('agendar_cita.formulario_nuevo', paciente_id=p.id) }}">+ Agendar cita</a>
+    {% endif %}
+    {% if usuario.rol == Rol.FISIOTERAPEUTA %}
+    <a class="boton" href="{{ url_for('registrar_terapia.formulario_paciente', paciente_id=p.id) }}">+ Registrar sesión</a>
+    {% endif %}
+{% endif %}
+{% endblock %}
+{% block contenido %}
+{% if not p.activo %}
+<div class="alerta alerta-aviso mensajes">Este paciente está dado de baja. Su historial se conserva solo para consulta.</div>
+{% endif %}
+
+<section class="tarjeta">
+    <h2>Datos del paciente</h2>
+    <dl class="ficha">
+        <div><dt>Cédula</dt><dd>{{ p.cedula }}</dd></div>
+        <div><dt>Fecha de nacimiento</dt><dd>{{ p.fecha_nacimiento|fecha }}{% if p.edad() is not none %} ({{ p.edad() }} años){% endif %}</dd></div>
+        <div><dt>Teléfono</dt><dd>{{ p.telefono or '—' }}</dd></div>
+        <div><dt>Correo</dt><dd>{{ p.correo or '—' }}</dd></div>
+        <div><dt>Dirección</dt><dd>{{ p.direccion or '—' }}</dd></div>
+        <div><dt>Contacto de emergencia</dt><dd>{{ p.contacto_emergencia or '—' }}</dd></div>
+        <div><dt>Registrado</dt><dd>{{ p.creado_en|fecha }}</dd></div>
+        <div><dt>Estado</dt><dd><span class="etiqueta etiqueta-{{ 'activo' if p.activo else 'inactivo' }}">{{ 'Activo' if p.activo else 'De baja' }}</span></dd></div>
+    </dl>
+</section>
+
+<div class="metricas">
+    <div class="metrica"><span>Sesiones de terapia</span><strong>{{ h.total_sesiones }}</strong></div>
+    <div class="metrica"><span>Citas registradas</span><strong>{{ h.citas|length }}</strong></div>
+    <div class="metrica"><span>Próximas citas</span><strong>{{ h.proximas_citas|length }}</strong></div>
+    <div class="metrica">
+        <span>Evolución del dolor (EVA)</span>
+        <strong>{% if h.evolucion_dolor %}{{ h.evolucion_dolor[0] }} → {{ h.evolucion_dolor[1] }}{% else %}—{% endif %}</strong>
+    </div>
+</div>
+
+<div class="rejilla">
+    <section class="tarjeta">
+        <h2>Sesiones de terapia</h2>
+        {% if h.terapias %}
+        <ol class="linea-tiempo">
+            {% for d in h.terapias %}
+            {% set t = d.terapia %}
+            <li>
+                <strong>{{ t.tipo }}</strong> · {{ t.zona_tratada }}
+                <div class="meta">{{ t.fecha|fecha }} · {{ d.fisioterapeuta_nombre }}</div>
+                <div>Dolor EVA: <span class="dolor {{ 'dolor-mejora' if t.mejora_dolor > 0 }}">{{ t.dolor_inicial }} → {{ t.dolor_final }}</span></div>
+                <p>{{ t.procedimiento }}</p>
+                {% if t.observaciones %}<p class="ayuda">Obs.: {{ t.observaciones }}</p>{% endif %}
+            </li>
+            {% endfor %}
+        </ol>
+        {% else %}
+        {{ vacio("Aún no hay sesiones registradas.") }}
+        {% endif %}
+    </section>
+
+    <section class="tarjeta">
+        <h2>Citas</h2>
+        {% if h.citas %}
+        <div class="tabla-contenedor">
+            <table>
+                <thead><tr><th>Fecha</th><th>Hora</th><th>Fisioterapeuta</th><th>Estado</th></tr></thead>
+                <tbody>
+                {% for d in h.citas %}
+                <tr>
+                    <td>{{ d.cita.fecha|fecha }}</td>
+                    <td>{{ d.cita.hora_inicio|hora }}</td>
+                    <td>{{ d.fisioterapeuta_nombre }}</td>
+                    <td>{{ estado_cita(d.cita.estado) }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        {{ vacio("Sin citas registradas.") }}
+        {% endif %}
+    </section>
+</div>
+
+{% if usuario.rol in (Rol.ADMINISTRADOR, Rol.RECEPCIONISTA) %}
+<section class="tarjeta no-imprimir">
+    <h2>Estado del registro</h2>
+    {% if p.activo %}
+    <p class="ayuda">Dar de baja oculta al paciente de búsquedas y agendamiento, pero conserva su historial (RF-03).</p>
+    <form method="post" action="{{ url_for('dar_de_baja_paciente.dar_de_baja', paciente_id=p.id) }}"
+          data-confirmar="¿Dar de baja a {{ p.nombre_completo }}?">
+        {{ csrf() }}
+        <button class="boton boton-peligro" type="submit">Dar de baja</button>
+    </form>
+    {% else %}
+    <form method="post" action="{{ url_for('dar_de_baja_paciente.reactivar', paciente_id=p.id) }}">
+        {{ csrf() }}
+        <button class="boton boton-secundario" type="submit">Reactivar paciente</button>
+    </form>
+    {% endif %}
+</section>
+{% endif %}
+{% endblock %}

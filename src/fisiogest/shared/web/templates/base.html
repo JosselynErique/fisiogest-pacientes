@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}FisioGest{% endblock %} · FisioGest</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</head>
+<body>
+{% if usuario %}
+<div class="layout">
+    <aside class="sidebar">
+        <a class="marca" href="{{ url_for('panel.ver') }}">
+            <span class="marca-logo">FG</span>
+            <span>
+                <strong>FisioGest</strong>
+                <small>Consultorio de fisioterapia</small>
+            </span>
+        </a>
+        <nav class="menu">
+            {% for item in menu %}
+            {% set ruta = url_for(item.endpoint) %}
+            <a href="{{ ruta }}"
+               class="{{ 'activo' if (request.path == ruta if ruta == '/' else request.path.startswith(ruta)) }}">
+                {{ item.etiqueta }}
+            </a>
+            {% endfor %}
+        </nav>
+        <div class="sidebar-pie">
+            <div class="perfil">
+                <span class="avatar">{{ usuario.nombre_completo[:1] }}</span>
+                <span>
+                    <strong>{{ usuario.nombre_completo }}</strong>
+                    <small class="rol rol-{{ usuario.rol.value }}">{{ usuario.rol.etiqueta }}</small>
+                </span>
+            </div>
+            <form method="post" action="{{ url_for('iniciar_sesion.salir') }}">
+                <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+                <button class="boton boton-fantasma boton-bloque" type="submit">Cerrar sesión</button>
+            </form>
+        </div>
+    </aside>
+    <main class="contenido">
+        <header class="cabecera">
+            <div>
+                {% block migas %}{% endblock %}
+                <h1>{% block encabezado %}{{ self.titulo() }}{% endblock %}</h1>
+            </div>
+            <div class="acciones">{% block acciones %}{% endblock %}</div>
+        </header>
+        {% include "_mensajes.html" %}
+        {% block contenido %}{% endblock %}
+    </main>
+</div>
+{% else %}
+<main class="pantalla-publica">
+    {% include "_mensajes.html" %}
+    {% block publico %}{% endblock %}
+</main>
+{% endif %}
+</body>
+</html>

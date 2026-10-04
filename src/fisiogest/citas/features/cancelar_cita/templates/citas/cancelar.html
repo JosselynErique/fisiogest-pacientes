@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_macros.html" import area, csrf, estado_cita %}
+{% block titulo %}Cancelar cita{% endblock %}
+{% block migas %}<p class="migas"><a href="{{ url_for('consultar_agenda.ver', fecha=detalle.cita.fecha.isoformat()) }}">Agenda</a> / Cancelar cita</p>{% endblock %}
+{% block contenido %}
+<section class="tarjeta">
+    <dl class="ficha">
+        <div><dt>Paciente</dt><dd>{{ detalle.paciente_nombre }}</dd></div>
+        <div><dt>Fisioterapeuta</dt><dd>{{ detalle.fisioterapeuta_nombre }}</dd></div>
+        <div><dt>Fecha</dt><dd>{{ detalle.cita.fecha|fecha }}</dd></div>
+        <div><dt>Horario</dt><dd>{{ detalle.cita.hora_inicio|hora }} – {{ detalle.cita.hora_fin|hora }}</dd></div>
+        <div><dt>Estado</dt><dd>{{ estado_cita(detalle.cita.estado) }}</dd></div>
+    </dl>
+</section>
+<section class="tarjeta">
+    <form method="post" class="formulario" novalidate>
+        {{ csrf() }}
+        {{ area("motivo_cancelacion", "Motivo de la cancelación", datos, errores, requerido=true) }}
+        <div class="pie-formulario">
+            <a class="boton boton-secundario" href="{{ url_for('consultar_agenda.ver', fecha=detalle.cita.fecha.isoformat()) }}">Volver</a>
+            <button class="boton boton-peligro" type="submit">Cancelar cita</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

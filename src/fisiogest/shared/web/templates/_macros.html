@@ -1,0 +1,42 @@
+{% macro campo(nombre, etiqueta, datos, errores, tipo="text", requerido=false, ayuda="", attrs="") -%}
+<div class="campo {{ 'con-error' if errores.get(nombre) }}">
+    <label for="{{ nombre }}">{{ etiqueta }}{% if requerido %} <span class="obligatorio">*</span>{% endif %}</label>
+    <input type="{{ tipo }}" id="{{ nombre }}" name="{{ nombre }}" value="{{ datos.get(nombre, '') }}"
+           {% if requerido %}required{% endif %} {{ attrs|safe }}>
+    {% if errores.get(nombre) %}<p class="error-campo">{{ errores[nombre] }}</p>
+    {% elif ayuda %}<p class="ayuda">{{ ayuda }}</p>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro area(nombre, etiqueta, datos, errores, requerido=false, filas=3) -%}
+<div class="campo campo-ancho {{ 'con-error' if errores.get(nombre) }}">
+    <label for="{{ nombre }}">{{ etiqueta }}{% if requerido %} <span class="obligatorio">*</span>{% endif %}</label>
+    <textarea id="{{ nombre }}" name="{{ nombre }}" rows="{{ filas }}" {% if requerido %}required{% endif %}>{{ datos.get(nombre, '') }}</textarea>
+    {% if errores.get(nombre) %}<p class="error-campo">{{ errores[nombre] }}</p>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro seleccion(nombre, etiqueta, opciones, datos, errores, requerido=false, vacio="Seleccione…") -%}
+<div class="campo {{ 'con-error' if errores.get(nombre) }}">
+    <label for="{{ nombre }}">{{ etiqueta }}{% if requerido %} <span class="obligatorio">*</span>{% endif %}</label>
+    <select id="{{ nombre }}" name="{{ nombre }}" {% if requerido %}required{% endif %}>
+        {% if vacio %}<option value="">{{ vacio }}</option>{% endif %}
+        {% for valor, texto in opciones %}
+        <option value="{{ valor }}" {{ 'selected' if datos.get(nombre, '')|string == valor|string }}>{{ texto }}</option>
+        {% endfor %}
+    </select>
+    {% if errores.get(nombre) %}<p class="error-campo">{{ errores[nombre] }}</p>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro csrf() -%}
+<input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+{%- endmacro %}
+
+{% macro estado_cita(estado) -%}
+<span class="etiqueta etiqueta-{{ estado.value }}">{{ estado.etiqueta }}</span>
+{%- endmacro %}
+
+{% macro vacio(mensaje) -%}
+<div class="vacio">{{ mensaje }}</div>
+{%- endmacro %}

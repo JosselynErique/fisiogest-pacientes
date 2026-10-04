@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% from "_macros.html" import estado_cita, vacio %}
+{% block titulo %}Agenda{% endblock %}
+{% block encabezado %}Agenda · {{ agenda.fecha|fecha }}{% endblock %}
+{% block acciones %}
+<a class="boton boton-secundario" href="{{ url_for('consultar_agenda.ver', fecha=anterior.isoformat(), fisioterapeuta_id=fisio_id) }}">← Día anterior</a>
+<a class="boton boton-secundario" href="{{ url_for('consultar_agenda.ver', fisioterapeuta_id=fisio_id) }}">Hoy</a>
+<a class="boton boton-secundario" href="{{ url_for('consultar_agenda.ver', fecha=siguiente.isoformat(), fisioterapeuta_id=fisio_id) }}">Día siguiente →</a>
+{% if usuario.rol in (Rol.ADMINISTRADOR, Rol.RECEPCIONISTA) %}
+<a class="boton" href="{{ url_for('agendar_cita.formulario_nuevo', fecha=agenda.fecha.isoformat()) }}">+ Agendar cita</a>
+{% endif %}
+{% endblock %}
+{% block contenido %}
+<div class="metricas">
+    <div class="metrica"><span>Citas del día</span><strong>{{ agenda.citas|length }}</strong></div>
+    <div class="metrica"><span>Programadas</span><strong>{{ agenda.programadas }}</strong></div>
+    <div class="metrica"><span>Atendidas</span><strong>{{ agenda.atendidas }}</strong></div>
+    <div class="metrica"><span>Canceladas</span><strong>{{ agenda.canceladas }}</strong></div>
+</div>
+<section class="tarjeta">
+    <form class="filtros" method="get">
+        <div class="campo">
+            <label for="fecha">Fecha</label>
+            <input type="date" id="fecha" name="fecha" value="{{ agenda.fecha.isoformat() }}" data-autoenviar>
+        </div>
+        {% if usuario.rol != Rol.FISIOTERAPEUTA %}
+        <div class="campo">
+            <label for="fisioterapeuta_id">Fisioterapeuta</label>
+            <select id="fisioterapeuta_id" name="fisioterapeuta_id" data-autoenviar>
+                <option value="">Todos</option>
+                {% for f in fisios %}
+                <option value="{{ f.id }}" {{ 'selected' if fisio_id == f.id }}>{{ f.nombre_completo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+    </form>
+
+    {% if agenda.citas %}
+    <div class="tabla-contenedor">
+        <table>
+            <thead>
+            <tr><th>Horario</th><th>Paciente</th><th>Fisioterapeuta</th><th>Motivo</th><th>Estado</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for d in agenda.citas %}
+            {% set c = d.cita %}
+            <tr class="{{ 'inactivo' if c.estado.value == 'cancelada' }}">
+                <td><strong>{{ c.hora_inicio|hora }}</strong> – {{ c.hora_fin|hora }}</td>
+                <td><a href="{{ url_for('consultar_historial.ver', paciente_id=c.paciente_id) }}">{{ d.paciente_nombre }}</a></td>
+                <td>{{ d.fisioterapeuta_nombre }}</td>
+                <td>{{ c.motivo or '—' }}{% if c.motivo_cancelacion %}<br><small class="ayuda">Cancelada: {{ c.motivo_cancelacion }}</small>{% endif %}</td>
+                <td>{{ estado_cita(c.estado) }}</td>
+                <td class="acciones-fila">
+                    {% if c.estado.value == 'programada' %}
+                        {% if c.fecha <= hoy and (usuario.rol == Rol.ADMINISTRADOR or usuario.id == c.fisioterapeuta_id) %}
+                        <a class="boton boton-pequeno" href="{{ url_for('registrar_terapia.formulario_cita', cita_id=c.id) }}">Atender</a>
+                        {% endif %}
+                        {% if usuario.rol in (Rol.ADMINISTRADOR, Rol.RECEPCIONISTA) %}
+                        <a class="boton boton-pequeno boton-peligro" href="{{ url_for('cancelar_cita.confirmar', cita_id=c.id) }}">Cancelar</a>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    {{ vacio("No hay citas para esta fecha.") }}
+    {% endif %}
+</section>
+{% endblock %}

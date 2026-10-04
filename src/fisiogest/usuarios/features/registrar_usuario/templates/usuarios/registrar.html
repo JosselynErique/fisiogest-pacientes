@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "_macros.html" import campo, seleccion, csrf %}
+{% block titulo %}Nuevo usuario{% endblock %}
+{% block migas %}<p class="migas"><a href="{{ url_for('listar_usuarios.listar') }}">Usuarios</a> / Nuevo</p>{% endblock %}
+{% block contenido %}
+<section class="tarjeta">
+    <form method="post" class="formulario" novalidate>
+        {{ csrf() }}
+        {{ campo("nombre_completo", "Nombre completo", datos, errores, requerido=true) }}
+        {{ campo("username", "Usuario", datos, errores, requerido=true, ayuda="Ej.: fisio.maria (minúsculas, sin espacios)") }}
+        {{ seleccion("rol", "Rol", roles, datos, errores, requerido=true) }}
+        {{ campo("password", "Contraseña", {}, errores, tipo="password", requerido=true, ayuda="Mínimo 8 caracteres con letras y números") }}
+        <div class="pie-formulario">
+            <a class="boton boton-secundario" href="{{ url_for('listar_usuarios.listar') }}">Cancelar</a>
+            <button class="boton" type="submit">Crear usuario</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

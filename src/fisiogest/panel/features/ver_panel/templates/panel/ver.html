@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "_macros.html" import estado_cita, vacio %}
+{% block titulo %}Inicio{% endblock %}
+{% block encabezado %}Hola, {{ usuario.nombre_completo.split()[0] }}{% endblock %}
+{% block acciones %}
+{% if usuario.rol in (Rol.ADMINISTRADOR, Rol.RECEPCIONISTA) %}
+<a class="boton boton-secundario" href="{{ url_for('registrar_paciente.formulario_nuevo') }}">+ Paciente</a>
+<a class="boton" href="{{ url_for('agendar_cita.formulario_nuevo') }}">+ Agendar cita</a>
+{% endif %}
+{% endblock %}
+{% block contenido %}
+<div class="metricas">
+    <div class="metrica"><span>Pacientes activos</span><strong>{{ r.pacientes_activos }}</strong></div>
+    <div class="metrica"><span>{{ 'Mis citas' if usuario.rol == Rol.FISIOTERAPEUTA else 'Citas' }} de hoy</span><strong>{{ r.citas_hoy|length }}</strong></div>
+    <div class="metrica"><span>Pendientes hoy</span><strong>{{ r.pendientes_hoy|length }}</strong></div>
+    <div class="metrica"><span>Sesiones este mes</span><strong>{{ r.sesiones_mes }}</strong></div>
+    <div class="metrica"><span>Pacientes atendidos este mes</span><strong>{{ r.pacientes_atendidos_mes }}</strong></div>
+</div>
+
+<section class="tarjeta">
+    <h2>Agenda de hoy · {{ hoy|fecha }}</h2>
+    {% if r.citas_hoy %}
+    <div class="tabla-contenedor">
+        <table>
+            <thead><tr><th>Hora</th><th>Paciente</th><th>Fisioterapeuta</th><th>Motivo</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+            {% for d in r.citas_hoy %}
+            <tr class="{{ 'inactivo' if d.cita.estado.value == 'cancelada' }}">
+                <td><strong>{{ d.cita.hora_inicio|hora }}</strong></td>
+                <td><a href="{{ url_for('consultar_historial.ver', paciente_id=d.cita.paciente_id) }}">{{ d.paciente_nombre }}</a></td>
+                <td>{{ d.fisioterapeuta_nombre }}</td>
+                <td>{{ d.cita.motivo or '—' }}</td>
+                <td>{{ estado_cita(d.cita.estado) }}</td>
+                <td class="acciones-fila">
+                    {% if d.cita.estado.value == 'programada' and (usuario.rol == Rol.ADMINISTRADOR or usuario.id == d.cita.fisioterapeuta_id) %}
+                    <a class="boton boton-pequeno" href="{{ url_for('registrar_terapia.formulario_cita', cita_id=d.cita.id) }}">Atender</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    {{ vacio("No hay citas para hoy.") }}
+    {% endif %}
+</section>
+{% endblock %}
