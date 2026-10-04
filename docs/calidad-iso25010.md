@@ -10,7 +10,7 @@ apreciación.
 
 | Característica | Subcaracterísticas evaluadas | Evidencia / métrica | Nota | Nivel |
 |---|---|---|---|---|
-| **Adecuación funcional** | Completitud, corrección, pertinencia | 10/10 RF del SRS implementados; 149 pruebas automatizadas pasan; cada RF tiene al menos una prueba que lo verifica | 5,0 | Alto |
+| **Adecuación funcional** | Completitud, corrección, pertinencia | 10/10 RF del SRS implementados; 150 pruebas automatizadas pasan; cada RF tiene al menos una prueba que lo verifica | 5,0 | Alto |
 | **Eficiencia de desempeño** | Comportamiento temporal, capacidad | Promedio < 2 ms por página con datos demo; búsqueda entre 5 000 pacientes: 3,2 ms; listado completo de 5 000: 76 ms (RNF-01 exige < 3 s) | 4,5 | Alto |
 | **Compatibilidad** | Interoperabilidad, coexistencia | Web estándar (cualquier navegador); exporta reportes a CSV (Excel); no expone API para otros sistemas | 3,5 | Medio |
 | **Usabilidad** | Aprendizaje, protección contra errores, estética | Menú según rol, validación por campo con mensajes claros, confirmación de acciones destructivas, diseño responsivo. No se hizo prueba formal con usuarios reales | 4,0 | Alto |
@@ -43,7 +43,7 @@ apreciación.
 ## Cómo reproducir las mediciones
 
 ```bash
-pytest -q                 # adecuación funcional: 149 pruebas
+pytest -q                 # adecuación funcional: 150 pruebas
 pytest --cov              # mantenibilidad: cobertura
 ruff check .              # analizabilidad
 ```

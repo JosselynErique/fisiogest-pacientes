@@ -40,6 +40,8 @@ class RegistrarTerapia:
             raise NotFoundError("La cita no existe.")
         if cita.estado is not EstadoCita.PROGRAMADA:
             raise DomainError("La cita ya fue atendida o cancelada.")
+        if cita.fecha > self._reloj().date():
+            raise DomainError("Solo se pueden atender citas del día o de fechas anteriores.")
         if solicitante.rol is not Rol.ADMINISTRADOR and solicitante.id != cita.fisioterapeuta_id:
             raise DomainError("Solo el fisioterapeuta asignado puede atender esta cita.")
         return cita

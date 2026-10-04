@@ -28,7 +28,7 @@ Proyecto del componente pr谩ctico-experimental de **Ingenier铆a de Software** 鈥
 | RF-08 | Reportes de pacientes, citas y terapias | `reportes/features/generar_reporte` + exportaci贸n CSV |
 | RF-09 | Inicio de sesi贸n por rol | `usuarios/features/iniciar_sesion` + `requiere_rol` |
 | RF-10 | Cancelar citas | `citas/features/cancelar_cita` |
-| RNF-01 | Respuesta < 3 s | Consultas indexadas en SQLite; las 149 pruebas corren en ~6 s |
+| RNF-01 | Respuesta < 3 s | Consultas indexadas en SQLite; las 150 pruebas corren en ~6 s |
 | RNF-02 | Acceso con usuario y contrase帽a | Contrase帽as cifradas, bloqueo tras 5 intentos, CSRF, cabeceras seguras |
 | RNF-03 | Datos disponibles y protegidos | SQLite transaccional, claves for谩neas, baja l贸gica, volumen Docker |
 | RNF-04 | Interfaz sencilla | Interfaz web responsiva, mensajes claros y validaci贸n por campo |
@@ -170,7 +170,7 @@ consola).
 
 ```bash
 pip install -r requirements-dev.txt
-pytest                       # 149 pruebas
+pytest                       # 150 pruebas
 pytest -m unit               # dominio, casos de uso y arquitectura
 pytest -m integration        # SQLite + HTTP
 pytest -m acceptance         # flujo completo CP-06

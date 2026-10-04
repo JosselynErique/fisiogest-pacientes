@@ -38,6 +38,7 @@ from helpers import CEDULA_1, CEDULA_2
 
 pytestmark = pytest.mark.unit
 AHORA = datetime(2026, 10, 5, 8, 0)
+HOY = "2026-10-05"
 
 
 @pytest.fixture
@@ -159,7 +160,7 @@ DATOS_SESION = DatosTerapia(
 
 
 def test_rf06_registrar_sesion_desde_cita_la_marca_atendida(repos):
-    cita = agendar(repos, repos["p1"], repos["ana"])
+    cita = agendar(repos, repos["p1"], repos["ana"], fecha=HOY)
     caso = RegistrarTerapia(repos["terapias"], repos["pacientes"], repos["citas"], lambda: AHORA)
     terapia = caso.desde_cita(cita.id, DATOS_SESION, repos["ana"])
     assert terapia.cita_id == cita.id
@@ -167,14 +168,21 @@ def test_rf06_registrar_sesion_desde_cita_la_marca_atendida(repos):
 
 
 def test_rf06_solo_el_fisioterapeuta_asignado_atiende(repos):
-    cita = agendar(repos, repos["p1"], repos["ana"])
+    cita = agendar(repos, repos["p1"], repos["ana"], fecha=HOY)
     caso = RegistrarTerapia(repos["terapias"], repos["pacientes"], repos["citas"], lambda: AHORA)
     with pytest.raises(DomainError):
         caso.desde_cita(cita.id, DATOS_SESION, repos["luis"])
 
 
+def test_no_se_puede_atender_una_cita_futura(repos):
+    cita = agendar(repos, repos["p1"], repos["ana"], fecha="2026-10-07")
+    caso = RegistrarTerapia(repos["terapias"], repos["pacientes"], repos["citas"], lambda: AHORA)
+    with pytest.raises(DomainError, match="del día"):
+        caso.desde_cita(cita.id, DATOS_SESION, repos["ana"])
+
+
 def test_rf07_historial_consolida_citas_sesiones_y_evolucion(repos):
-    cita = agendar(repos, repos["p1"], repos["ana"])
+    cita = agendar(repos, repos["p1"], repos["ana"], fecha=HOY)
     caso = RegistrarTerapia(repos["terapias"], repos["pacientes"], repos["citas"], lambda: AHORA)
     caso.desde_cita(cita.id, DATOS_SESION, repos["ana"])
     caso.sin_cita(repos["p1"].id, DATOS_SESION, repos["ana"])

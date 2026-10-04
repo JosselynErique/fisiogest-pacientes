@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from flask import Blueprint, render_template, request
 
 from fisiogest.reportes.features.generar_reporte.caso_uso import GenerarReporte
@@ -15,7 +17,7 @@ def ver():
     c = contenedor()
     hoy = c.reloj().date()
     datos = {
-        "desde": request.args.get("desde") or hoy.replace(day=1).isoformat(),
+        "desde": request.args.get("desde") or (hoy - timedelta(days=30)).isoformat(),
         "hasta": request.args.get("hasta") or hoy.isoformat(),
     }
     try:

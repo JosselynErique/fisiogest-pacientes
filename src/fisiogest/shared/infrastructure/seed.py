@@ -137,54 +137,58 @@ def _cargar_demo_clinica(c: Container) -> None:
             creado_en=inicio - timedelta(days=3),
         )
 
-    horas = [time(h, m) for h in range(8, 18) for m in (0,)]
+    horas = [time(h, 0) for h in range(8, 18)]
+
+    def registrar_sesion(paciente, fisio, cita, zona, dolor) -> int:
+        cita.estado = EstadoCita.ATENDIDA
+        c.citas.guardar(cita)
+        final = max(0, dolor - azar.randint(1, 3))
+        c.terapias.guardar(
+            Terapia(
+                paciente_id=paciente.id,
+                fisioterapeuta_id=fisio.id,
+                cita_id=cita.id,
+                fecha=cita.fecha,
+                tipo=azar.choice(TIPOS_TERAPIA[:8]),
+                zona_tratada=zona,
+                dolor_inicial=dolor,
+                dolor_final=final,
+                procedimiento="Movilización articular, ejercicios de fortalecimiento y estiramiento guiado.",
+                observaciones=azar.choice(
+                    ("Buena tolerancia al tratamiento.", "Indicar ejercicios en casa.", "")
+                ),
+            )
+        )
+        return max(1, final + azar.randint(0, 1))
+
     for indice, paciente in enumerate(pacientes):
         fisio = fisios[indice % len(fisios)]
         motivo = MOTIVOS[indice % len(MOTIVOS)]
         zona = ZONAS[indice % len(ZONAS)]
         dolor = azar.randint(6, 9)
-        # Sesiones pasadas (2 por semana durante ~3 semanas)
-        for semana in range(3, 0, -1):
-            for desfase in (0, 2):
-                dia = hoy - timedelta(days=semana * 7 - desfase - indice % 3)
-                if dia >= hoy:
-                    continue
-                cita = crear_cita(paciente, fisio, dia, azar.choice(horas), motivo)
-                if cita is None:
-                    continue
-                if azar.random() < 0.12:
-                    cita.estado = EstadoCita.CANCELADA
-                    cita.motivo_cancelacion = "El paciente avisó que no podía asistir"
-                    c.citas.guardar(cita)
-                    continue
-                cita.estado = EstadoCita.ATENDIDA
+        # Sesiones pasadas: unas dos por semana durante el último mes (incluye los últimos días)
+        for dias_atras in (27, 24, 20, 17, 13, 10, 6, 3, 1):
+            dia = hoy - timedelta(days=dias_atras + indice % 2)
+            cita = crear_cita(paciente, fisio, dia, azar.choice(horas), motivo)
+            if cita is None:
+                continue
+            if azar.random() < 0.12:
+                cita.estado = EstadoCita.CANCELADA
+                cita.motivo_cancelacion = "El paciente avisó que no podía asistir"
                 c.citas.guardar(cita)
-                final = max(0, dolor - azar.randint(1, 3))
-                c.terapias.guardar(
-                    Terapia(
-                        paciente_id=paciente.id,
-                        fisioterapeuta_id=fisio.id,
-                        cita_id=cita.id,
-                        fecha=dia,
-                        tipo=azar.choice(TIPOS_TERAPIA[:8]),
-                        zona_tratada=zona,
-                        dolor_inicial=dolor,
-                        dolor_final=final,
-                        procedimiento="Movilización articular, ejercicios de fortalecimiento y estiramiento guiado.",
-                        observaciones=azar.choice(
-                            ("Buena tolerancia al tratamiento.", "Indicar ejercicios en casa.", "")
-                        ),
-                    )
-                )
-                dolor = max(1, final + azar.randint(0, 1))
-        # Citas de hoy y próximos días
-        for dias in (0, 2, 7):
-            dia = hoy + timedelta(days=dias)
-            hora = time(9 + indice, 0) if dias == 0 else azar.choice(horas)
-            if dias == 0 and (
-                hora.hour >= 19 or datetime.combine(dia, hora) < ahora - timedelta(hours=1)
-            ):
-                hora = time(min(18, max(ahora.hour + 1, 8) + indice % 3), 0)
-            cita = crear_cita(paciente, fisio, dia, hora, motivo)
+                continue
+            dolor = registrar_sesion(paciente, fisio, cita, zona, dolor)
+        # Agenda de hoy: las citas que ya pasaron quedan atendidas, el resto programadas
+        cita = crear_cita(paciente, fisio, hoy, time(8 + indice, 0), motivo)
+        if cita is not None:
+            if datetime.combine(hoy, cita.hora_inicio) < ahora:
+                dolor = registrar_sesion(paciente, fisio, cita, zona, dolor)
+            else:
+                c.citas.guardar(cita)
+        # Próximas citas
+        for dias in (2, 7):
+            cita = crear_cita(
+                paciente, fisio, hoy + timedelta(days=dias), azar.choice(horas), motivo
+            )
             if cita is not None:
                 c.citas.guardar(cita)

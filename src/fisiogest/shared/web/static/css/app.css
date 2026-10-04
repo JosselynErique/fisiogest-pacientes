@@ -34,7 +34,10 @@ h1, h2, h3 { line-height: 1.25; margin: 0; }
 h2 { font-size: 1.05rem; margin-bottom: 14px; }
 
 /* ---------- Estructura ---------- */
-.layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.layout {
+    display: grid; grid-template-columns: 240px 1fr; min-height: 100vh;
+    background: linear-gradient(to right, #10343b 240px, var(--fondo) 240px);
+}
 
 .sidebar {
     background: #10343b;
@@ -198,7 +201,7 @@ td.acciones-fila form { display: inline; }
 .credenciales-demo code { color: var(--texto); }
 
 @media (max-width: 860px) {
-    .layout { grid-template-columns: 1fr; }
+    .layout { grid-template-columns: 1fr; background: var(--fondo); }
     .sidebar { position: static; height: auto; }
     .menu { flex-direction: row; flex-wrap: wrap; }
     .contenido { padding: 20px 16px 40px; }

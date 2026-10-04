@@ -22,7 +22,7 @@ terminado. El tablero se gestionó en **Jira** (proyecto `FG`) con las columnas:
 | U1 · Fundamentos y ciclo de vida | 1–4 | Análisis del problema, principios, comparación de modelos, elección de Kanban | ✔ |
 | U2 · Requerimientos y diseño | 5–8 | Entrevista, mini SRS (10 RF, 4 RNF), casos de uso, clases, arquitectura y patrones | ✔ |
 | U3 · Implementación y pruebas | 9–12 | Matriz tecnológica (Flask), módulo de pacientes, repositorio Git, plan de pruebas, CI | ✔ |
-| U4 · Gestión y calidad | 13–15 | Sistema completo con arquitectura hexagonal, 149 pruebas, CI/Docker, Jira, ISO/IEC 25010 | ✔ |
+| U4 · Gestión y calidad | 13–15 | Sistema completo con arquitectura hexagonal, 150 pruebas, CI/Docker, Jira, ISO/IEC 25010 | ✔ |
 | Cierre | 16 | Informe ejecutivo y defensa | ✔ |
 
 ```mermaid

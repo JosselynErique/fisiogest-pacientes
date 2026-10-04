@@ -53,7 +53,7 @@
                 <td>{{ estado_cita(c.estado) }}</td>
                 <td class="acciones-fila">
                     {% if c.estado.value == 'programada' %}
-                        {% if usuario.rol == Rol.ADMINISTRADOR or usuario.id == c.fisioterapeuta_id %}
+                        {% if c.fecha <= hoy and (usuario.rol == Rol.ADMINISTRADOR or usuario.id == c.fisioterapeuta_id) %}
                         <a class="boton boton-pequeno" href="{{ url_for('registrar_terapia.formulario_cita', cita_id=c.id) }}">Atender</a>
                         {% endif %}
                         {% if usuario.rol in (Rol.ADMINISTRADOR, Rol.RECEPCIONISTA) %}
