@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf %}
+{% block titulo %}Usuarios{% endblock %}
+{% block acciones %}<a class="boton" href="{{ url_for('registrar_usuario.formulario_nuevo') }}">+ Nuevo usuario</a>{% endblock %}
+{% block contenido %}
+<section class="tarjeta">
+    <div class="tabla-contenedor">
+        <table>
+            <thead>
+            <tr><th>Nombre</th><th>Usuario</th><th>Rol</th><th>Estado</th><th>Creado</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for u in usuarios %}
+            <tr class="{{ 'inactivo' if not u.activo }}">
+                <td>{{ u.nombre_completo }}</td>
+                <td><code>{{ u.username }}</code></td>
+                <td>{{ u.rol.etiqueta }}</td>
+                <td><span class="etiqueta etiqueta-{{ 'activo' if u.activo else 'inactivo' }}">{{ 'Activo' if u.activo else 'Inactivo' }}</span></td>
+                <td>{{ u.creado_en|fecha }}</td>
+                <td class="acciones-fila">
+                    {% if u.id != usuario.id %}
+                    <form method="post" action="{{ url_for('cambiar_estado_usuario.cambiar', usuario_id=u.id) }}"
+                          data-confirmar="¿{{ 'Desactivar' if u.activo else 'Activar' }} la cuenta de {{ u.nombre_completo }}?">
+                        {{ csrf() }}
+                        <input type="hidden" name="activo" value="{{ '0' if u.activo else '1' }}">
+                        <button class="boton boton-pequeno {{ 'boton-peligro' if u.activo else 'boton-secundario' }}">
+                            {{ 'Desactivar' if u.activo else 'Activar' }}
+                        </button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
