@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "_macros.html" import campo, seleccion, area, csrf %}
+{% block titulo %}Agendar cita{% endblock %}
+{% block migas %}<p class="migas"><a href="{{ url_for('consultar_agenda.ver') }}">Agenda</a> / Nueva cita</p>{% endblock %}
+{% block contenido %}
+<section class="tarjeta">
+    <form method="post" class="formulario" novalidate>
+        {{ csrf() }}
+        {{ seleccion("paciente_id", "Paciente", pacientes, datos, errores, requerido=true) }}
+        {{ seleccion("fisioterapeuta_id", "Fisioterapeuta", fisios, datos, errores, requerido=true) }}
+        {{ campo("fecha", "Fecha", datos, errores, tipo="date", requerido=true, ayuda="Lunes a sábado") }}
+        {{ campo("hora_inicio", "Hora de inicio", datos, errores, tipo="time", requerido=true, ayuda="Horario de atención 07:00 a 20:00", attrs='step="900"') }}
+        {{ seleccion("duracion_minutos", "Duración", duraciones, datos, errores, requerido=true, vacio="") }}
+        {{ area("motivo", "Motivo de la consulta", datos, errores, filas=2) }}
+        <div class="pie-formulario">
+            <a class="boton boton-secundario" href="{{ url_for('consultar_agenda.ver') }}">Cancelar</a>
+            <button class="boton" type="submit">Agendar cita</button>
+        </div>
+    </form>
+</section>
+{% endblock %}
