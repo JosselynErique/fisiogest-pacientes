@@ -1,12 +1,24 @@
 # Entorno virtual
 .venv/
+venv/
 
 # Archivos de Python
 __pycache__/
 *.pyc
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Base de datos local (se crea al ejecutar)
+instance/
+*.db
 
 # Variables de entorno
 .env
 
-# Configuración de VS Code
+# Configuración de editores / SO
 .vscode/
+.idea/
+.DS_Store
